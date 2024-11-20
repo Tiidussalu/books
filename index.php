@@ -1,15 +1,16 @@
 <?php
+// Include the database connection file
 require_once('./connection.php');
 
-// Handle the search query if present
+// Get the search query from the URL if it's present, otherwise set it to an empty string
 $searchQuery = isset($_GET['search']) ? $_GET['search'] : '';
 
-// Modify the SQL query to include search functionality
+// Prepare the SQL query to fetch books, applying the search query if provided
 $stmt = $pdo->prepare('
     SELECT * FROM books 
     WHERE is_deleted = 0 AND title LIKE :searchQuery
 ');
-$stmt->execute(['searchQuery' => '%' . $searchQuery . '%']);
+$stmt->execute(['searchQuery' => '%' . $searchQuery . '%']); // Execute the query with the search term
 ?>
 
 <!DOCTYPE html>
@@ -158,6 +159,7 @@ $stmt->execute(['searchQuery' => '%' . $searchQuery . '%']);
 
     <!-- Search Bar -->
     <div class="search-container">
+        <!-- Form to handle the search query -->
         <form action="index.php" method="get">
             <input type="text" name="search" placeholder="Search books..." value="<?= htmlspecialchars($searchQuery); ?>">
             <button type="submit">Search</button>
@@ -169,7 +171,7 @@ $stmt->execute(['searchQuery' => '%' . $searchQuery . '%']);
         <?php while ($book = $stmt->fetch()) { ?>
             <div class="book-card">
                 <!-- Book Image -->
-                <img src="path/to/book-image.jpg" alt="Book Image">
+                <img src="<?= $book['cover_path']; ?>" alt="Book Image">
 
                 <!-- Book Title -->
                 <h3><?= htmlspecialchars($book['title']); ?></h3>

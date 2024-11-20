@@ -1,7 +1,7 @@
 <?php
 
 // Update book data if form is submitted
-if (isset($_POST['action']) && $_POST['action'] == 'Salvesta') {
+if (isset($_POST['action']) && $_POST['action'] == 'Save') {
     
     require_once('./connection.php');
 

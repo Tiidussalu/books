@@ -1,15 +1,21 @@
 <?php
 
+// Include the database connection file
 require_once('./connection.php');
 
+// Get the book ID from the query string (URL parameter)
 $id = $_GET['id'];
 
+// Prepare an SQL query to select the book details based on the book ID
 $stmt = $pdo->prepare('SELECT * FROM books WHERE id = :id');
 $stmt->execute(['id' => $id]);
+// Fetch the book details from the database
 $book = $stmt->fetch();
 
+// Prepare an SQL query to select the authors for the specific book by joining book_authors and authors tables
 $stmt = $pdo->prepare('SELECT * FROM book_authors ba LEFT JOIN authors a ON ba.author_id=a.id WHERE ba.book_id = :id');
 $stmt->execute(['id' => $id]);
+// The result will be the list of authors associated with the book
 
 ?>
 
@@ -18,9 +24,9 @@ $stmt->execute(['id' => $id]);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($book['title']); ?></title>
+    <title><?= htmlspecialchars($book['title']); ?></title> <!-- Display the book title in the browser's title bar -->
     <style>
-        /* Reset and global styles */
+        /* Reset and global styles for the page */
         body {
             font-family: 'Arial', sans-serif;
             margin: 0;
@@ -56,12 +62,12 @@ $stmt->execute(['id' => $id]);
         }
         .authors-list li:hover {
             background: #e9ecef;
-            transform: scale(1.02);
+            transform: scale(1.02); /* Add a scaling effect on hover */
         }
         .price {
             font-size: 1.2rem;
             font-weight: bold;
-            color: #28a745;
+            color: #28a745; /* Green color for the price */
             margin-top: 10px;
         }
         .actions a, .actions form input[type="submit"] {
@@ -77,7 +83,7 @@ $stmt->execute(['id' => $id]);
             transition: background 0.3s;
         }
         .actions a:hover, .actions form input[type="submit"]:hover {
-            background: #0056b3;
+            background: #0056b3; /* Darker blue on hover */
         }
         .actions form {
             display: inline-block;
@@ -99,31 +105,38 @@ $stmt->execute(['id' => $id]);
         }
         
         .back-button:hover {
-            background-color: #999;
+            background-color: #999; /* Darker gray when hovering */
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <!-- Display the book title -->
     <h1 class="title"><?= htmlspecialchars($book['title']); ?></h1>
 
+    <!-- Section displaying authors associated with the book -->
     <h2>Authors:</h2>
     <ul class="authors-list">
-        <?php while ($author = $stmt->fetch()) { ?>
+        <?php 
+        // Loop through the authors returned by the query
+        while ($author = $stmt->fetch()) { ?>
             <li>
+                <!-- Display first name and last name of each author -->
                 <?= htmlspecialchars($author['first_name']); ?> <?= htmlspecialchars($author['last_name']); ?>
             </li>
         <?php } ?>
     </ul>
 
-    <p class="price">Price: <?= round($book['price'], 2); ?> &euro;</p>
+    <!-- Display the book price, rounded to 2 decimal places -->
+    <p class="price">Price: <?= number_format($book['price'], 2); ?> &euro;</p>
 
+    <!-- Action button for editing the book -->
     <div class="actions">
         <a href="./edit.php?id=<?= $id; ?>">Edit</a>
     </div>
 
-    <!-- Back Button -->
+    <!-- Back button to return to the list of books -->
     <button class="back-button" onclick="window.location.href='./index.php';">Back to Books List</button>
 </div>
 
